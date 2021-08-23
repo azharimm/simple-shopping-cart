@@ -3,6 +3,7 @@ import { useQuery } from "react-query";
 //Components
 import { LinearProgress, Grid, Drawer, Badge } from "@material-ui/core";
 import { AddShoppingCart } from "@material-ui/icons";
+import Item from "./Items/Items";
 //Styles
 import { Wrapper } from "./App.styles";
 
@@ -25,13 +26,23 @@ const App = () => {
 		getProducts
 	);
 	const getTotalItems = () => null;
-	const handleAddToCart = () => null;
+	const handleAddToCart = (clickedItem: CartItemType) => null;
 	const removeFromCart = () => null;
 
 	if(isLoading) return <LinearProgress />
 	if(error) return <div>Somethign went wrong!</div>
 
-	return <div className="App">Start</div>;
+	return (
+		<Wrapper>
+			<Grid container spacing={3}>
+				{data?.map(item => (
+					<Grid item key={item.id} xs={12} sm={4}>
+						<Item item={item} handleAddToCart={handleAddToCart} />
+					</Grid>
+				))}
+			</Grid>
+		</Wrapper>
+	)
 };
 
 export default App;
