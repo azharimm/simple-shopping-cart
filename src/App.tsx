@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { useQuery } from "react-query";
 //Components
 import { LinearProgress, Grid, Drawer, Badge } from "@material-ui/core";
-import { AddShoppingCart } from "@material-ui/icons";
+import AddShoppingCartIcon from "@material-ui/icons/AddShoppingCart";
 import Item from "./Items/Items";
 //Styles
-import { Wrapper } from "./App.styles";
+import { Wrapper, StyledButton } from "./App.styles";
 
 export type CartItemType = {
 	id: number;
@@ -21,11 +21,13 @@ const getProducts = async (): Promise<CartItemType[]> =>
 	await (await fetch("https://fakestoreapi.com/products")).json();
 
 const App = () => {
+	const [cartOpen, setCartOpen] = useState(false);
+	const [cartItems, setCartItems] = useState([] as CartItemType[]);
 	const { data, isLoading, error } = useQuery<CartItemType[]>(
 		"products",
 		getProducts
 	);
-	const getTotalItems = () => null;
+	const getTotalItems = (items: CartItemType[]) => null;
 	const handleAddToCart = (clickedItem: CartItemType) => null;
 	const removeFromCart = () => null;
 
@@ -34,6 +36,13 @@ const App = () => {
 
 	return (
 		<Wrapper>
+			<Drawer anchor='right' open={cartOpen} onClose={() => setCartOpen(false)}>
+				Cart is here
+			</Drawer>
+			<StyledButton onClick={() => setCartOpen(true)}>
+				<Badge badgeContent={getTotalItems(cartItems)} color='error'></Badge>
+				<AddShoppingCartIcon />
+			</StyledButton>
 			<Grid container spacing={3}>
 				{data?.map(item => (
 					<Grid item key={item.id} xs={12} sm={4}>
