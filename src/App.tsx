@@ -4,6 +4,7 @@ import { useQuery } from "react-query";
 import { LinearProgress, Grid, Drawer, Badge } from "@material-ui/core";
 import AddShoppingCartIcon from "@material-ui/icons/AddShoppingCart";
 import Item from "./Items/Items";
+import Cart from "./Cart/Cart";
 //Styles
 import { Wrapper, StyledButton } from "./App.styles";
 
@@ -27,31 +28,59 @@ const App = () => {
 		"products",
 		getProducts
 	);
-	const getTotalItems = (items: CartItemType[]) => items.reduce((ack: number, item) => ack + item.amount, 0);
-	const handleAddToCart = (clickedItem: CartItemType) => null;
+	const getTotalItems = (items: CartItemType[]) =>
+		items.reduce((ack: number, item) => ack + item.amount, 0);
+	const handleAddToCart = (clickedItem: CartItemType) => {
+		setCartItems((prev) => {
+			//1. check if the items exist in the cart
+			const isItemInCart = prev.find(
+				(item) => item.id === clickedItem.id
+			);
+			if (isItemInCart) {
+				return prev.map((item) =>
+					item.id === clickedItem.id
+						? { ...item, amount: item.amount + 1 }
+						: item
+				);
+			}
+			//2. check if first time
+			return [...prev, { ...clickedItem, amount: 1 }];
+		});
+	};
 	const removeFromCart = () => null;
 
-	if(isLoading) return <LinearProgress />
-	if(error) return <div>Somethign went wrong!</div>
+	if (isLoading) return <LinearProgress />;
+	if (error) return <div>Somethign went wrong!</div>;
 
 	return (
 		<Wrapper>
-			<Drawer anchor='right' open={cartOpen} onClose={() => setCartOpen(false)}>
-				Cart is here
+			<Drawer
+				anchor="right"
+				open={cartOpen}
+				onClose={() => setCartOpen(false)}
+			>
+				<Cart
+					cartItems={cartItems}
+					addToCart={handleAddToCart}
+					removeFromCart={removeFromCart}
+				/>
 			</Drawer>
 			<StyledButton onClick={() => setCartOpen(true)}>
-				<Badge badgeContent={getTotalItems(cartItems)} color='error'></Badge>
+				<Badge
+					badgeContent={getTotalItems(cartItems)}
+					color="error"
+				></Badge>
 				<AddShoppingCartIcon />
 			</StyledButton>
 			<Grid container spacing={3}>
-				{data?.map(item => (
+				{data?.map((item) => (
 					<Grid item key={item.id} xs={12} sm={4}>
 						<Item item={item} handleAddToCart={handleAddToCart} />
 					</Grid>
 				))}
 			</Grid>
 		</Wrapper>
-	)
+	);
 };
 
 export default App;
